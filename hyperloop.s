@@ -160,7 +160,7 @@ forever:
 .endproc
 ;;; +----------------------------------------------------------------------+
 
-;;; update_toad - update position of toad for movement --------------------+
+;;; update_starship - update position of starship for movement ------------+
 .proc update_starship
     ; save registers
     php
@@ -182,7 +182,7 @@ Done:
 .endproc
 ;;; -----------------------------------------------------------------------+
 
-;;; draw_toad - to render the toad sprite at toad_y, toad_x ---------------+
+;;; draw_starship - to render the starship sprite at starship_y, starship_x+
 .proc draw_starship
     ; save registers
     php
@@ -192,29 +192,14 @@ Done:
     tya
     pha
 
-    ; write tile numbers
-    lda #$00
-    sta $0201
-    lda #$01
-    sta $0205
-
-    ; write tile attributes
-    lda #$00
-    sta $0202
-    sta $0206
-    sta $020a
-    sta $020e
-
-    ; write tile locations
-    lda starship_y
-    sta $0200   ; top left tile
-    sta $0204   ; top right tile
-
-    lda starship_x
-    sta $0203
-    clc
-    adc #$08
-    sta $0207
+    ; loop through the sprite data and render
+    ldx #$00
+LoadStarshipLoop:
+    lda StarshipSpriteData, x
+    sta $0200, x
+    inx
+    cpx #$24
+    bne LoadStarshipLoop
 
     ; restore registers
     pla
@@ -230,14 +215,21 @@ Done:
 
 ;;; Palette Data goes here ------------------------------------------------+
 PaletteData:
-    .byte $00, $0F, $00, $10, 	$00, $0A, $15, $01, 	$00, $29, $28, $27, 	$00, $34, $24, $14 	;background palettes
-    .byte $0C, $14, $23, $37, 	$00, $0F, $11, $30, 	$00, $0F, $30, $27, 	$00, $3C, $2C, $1C 	;sprite palettes
+    .byte $00, $00, $00, $00,   $00, $00, $00, $00,     $00, $00, $00, $00,  	$00, $00, $00, $00  ;background palettes
+    .byte $0F, $20, $10, $13, 	$00, $00, $00, $00,     $00, $00, $00, $00,  	$00, $00, $00, $00 	;sprite palettes
 ;;; -----------------------------------------------------------------------+
 
 ;;; Sprite Data goes here -------------------------------------------------+
-StarshipSpriteData:
+StarshipSpriteData: ; row, tile number, attribute, col
     .byte $40, $00, $00, $40
     .byte $40, $01, $00, $48
+    .byte $40, $02, $00, $4c
+    .byte $48, $10, $00, $40
+    .byte $48, $11, $00, $48
+    .byte $48, $12, $00, $4c
+    .byte $5c, $20, $00, $40
+    .byte $5c, $21, $00, $48
+    .byte $5c, $22, $00, $4c
 ;;; -----------------------------------------------------------------------+
 
 .segment "VECTORS"
